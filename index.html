@@ -400,17 +400,8 @@
                 type="text"
                 id="modelo"
                 name="modelo"
-                list="modelosSugeridos"
-                placeholder="Ex.: DCP-L5502DN"
                 class="w-full bg-white border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] focus:outline-none focus:border-[#1d5fa7]"
               />
-              <datalist id="modelosSugeridos">
-                <option value="DCP-L5502DN"></option>
-                <option value="HL-L6202DW"></option>
-                <option value="MFC-L8900CDW"></option>
-                <option value="MFC-L2750DW"></option>
-                <option value="HL-L5200DW"></option>
-              </datalist>
             </div>
           </div>
 
@@ -430,6 +421,18 @@
             </div>
           </div>
 
+          <!-- Alerta dinâmico de Número de Série duplicado -->
+          <div id="duplicateSerialAlert" class="hidden rounded-[3px] border border-amber-400 bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-950 flex items-center justify-between gap-2">
+            <span id="duplicateSerialText" class="font-medium leading-snug"></span>
+            <button
+              type="button"
+              id="btnJumpDuplicateSerial"
+              class="px-2 py-0.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] shrink-0 cursor-pointer"
+            >
+              Ver ficha
+            </button>
+          </div>
+
           <!-- 4. Endereço IP destacado com contorno vermelho + ações rápidas -->
           <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2 border-2 border-[#b91c1c] bg-[#fef2f2] rounded-[3px] px-2.5 py-2 my-1">
             <label for="enderecoIp" class="sm:col-span-4 text-left sm:text-right text-[#8b1e24] font-bold pr-1 whitespace-nowrap">
@@ -442,7 +445,7 @@
                 name="enderecoIp"
                 inputmode="decimal"
                 maxlength="15"
-                placeholder="192.168.100.254"
+                placeholder="10.86.3.15"
                 class="flex-1 min-w-0 bg-white border border-[#fca5a5] rounded-[3px] px-2 py-1.5 text-[#0b2545] font-semibold font-mono text-xs sm:text-[13px] tracking-tight focus:outline-none focus:border-[#b91c1c]"
               />
               <button
@@ -466,6 +469,18 @@
             </div>
           </div>
 
+          <!-- Alerta dinâmico de Endereço IP duplicado -->
+          <div id="duplicateIpAlert" class="hidden rounded-[3px] border border-amber-400 bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-950 flex items-center justify-between gap-2">
+            <span id="duplicateIpText" class="font-medium leading-snug"></span>
+            <button
+              type="button"
+              id="btnJumpDuplicateIp"
+              class="px-2 py-0.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] shrink-0 cursor-pointer"
+            >
+              Ver ficha
+            </button>
+          </div>
+
           <!-- 5. Endereço MAC -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="enderecoMac" class="col-span-5 text-right text-[#134074] font-medium pr-1">
@@ -478,58 +493,63 @@
                 name="enderecoMac"
                 maxlength="17"
                 placeholder="AF-7A-83-41-EF-D6"
-                class="w-full bg-white border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] font-mono text-xs sm:text-[13px] uppercase focus:outline-none focus:border-[#1d5fa7]"
+                class="w-full bg-white border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] font-mono uppercase focus:outline-none focus:border-[#1d5fa7]"
               />
             </div>
           </div>
 
-          <!-- 6. Proprietário -->
-          <div class="grid grid-cols-12 items-center gap-2.5 pt-0.5">
+          <!-- 6. Proprietário fixo -->
+          <div class="grid grid-cols-12 items-center gap-2.5 py-0.5">
             <span class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Proprietário:
             </span>
-            <div class="col-span-7 flex items-center gap-2">
-              <span id="proprietarioDisplay" class="font-bold text-[#0b2545]">DETRAN</span>
+            <div class="col-span-7">
+              <span class="font-bold text-[#0b2545] tracking-wide">DETRAN</span>
             </div>
           </div>
 
-          <!-- 7. Situação -->
+          <!-- 7. Situação com LED pulsante e ajuda contextual -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="situacao" class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Situação:
             </label>
             <div class="col-span-7 flex items-center gap-2">
-              <span class="relative flex h-3 w-3 shrink-0" title="Indicador visual de situação">
+              <span class="relative flex h-3 w-3 shrink-0" aria-hidden="true">
                 <span id="situacaoLedPing" class="status-led-ring absolute inline-flex h-full w-full rounded-full bg-rose-400"></span>
-                <span id="situacaoLedCore" class="relative inline-flex rounded-full h-3 w-3 bg-rose-600"></span>
+                <span id="situacaoLedCore" class="relative inline-flex rounded-full h-3 w-3 bg-[#8b1e24]"></span>
               </span>
-
               <select
                 id="situacao"
                 name="situacao"
-                class="flex-1 min-w-0 bg-white border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] font-semibold transition-colors duration-200 focus:outline-none focus:border-[#1d5fa7]"
+                class="flex-1 min-w-0 bg-rose-50 border border-rose-400 rounded-[3px] px-2.5 py-1.5 text-[#8b1e24] font-semibold focus:outline-none"
               >
-                <option value="NÃO REVISADA">NÃO REVISADA</option>
-                <option value="REVISADA">REVISADA</option>
-                <option value="AGUARDANDO PEÇAS">AGUARDANDO PEÇAS</option>
+                <option value="NÃO REVISADA" class="text-[#8b1e24] bg-white font-semibold">NÃO REVISADA</option>
+                <option value="REVISADA" class="text-[#15803d] bg-white font-semibold">REVISADA</option>
+                <option value="AGUARDANDO PEÇAS" class="text-[#b45309] bg-white font-semibold">AGUARDANDO PEÇAS</option>
               </select>
 
-              <div class="relative help-wrap shrink-0">
+              <div class="help-wrap relative inline-flex items-center">
                 <button
                   type="button"
-                  aria-label="Ajuda sobre situação"
-                  class="w-5 h-5 rounded-full bg-[#1d5fa7] hover:bg-[#0b2545] text-[#f5b700] text-[11px] font-bold flex items-center justify-center focus:outline-none cursor-pointer"
+                  aria-label="Ajuda sobre a situação da impressora"
+                  class="w-5 h-5 rounded-full bg-[#1d5fa7] hover:bg-[#134074] text-white text-[11px] font-bold flex items-center justify-center shadow-sm cursor-pointer"
                 >
                   ?
                 </button>
-                <div class="help-tooltip absolute right-0 bottom-7 w-64 bg-[#0b2545] text-white border border-[#f5b700]/60 text-[11px] leading-snug rounded p-2 shadow-lg z-30">
-                  Indica à empresa técnica prestadora de peças se a impressora está REVISADA, NÃO REVISADA ou AGUARDANDO PEÇAS neste departamento.
+                <div
+                  role="tooltip"
+                  class="help-tooltip pointer-events-none absolute right-0 bottom-7 w-64 bg-[#0b2545] text-white text-[11px] leading-snug rounded p-2.5 shadow-lg z-30 border border-[#f5b700]"
+                >
+                  <p class="font-bold text-[#f5b700] mb-1">Status de Revisão (Detran-TO):</p>
+                  <p>• <strong class="text-rose-300">NÃO REVISADA:</strong> pendente de conferência ou preventiva.</p>
+                  <p>• <strong class="text-emerald-300">REVISADA:</strong> conferida, limpa e operacional.</p>
+                  <p>• <strong class="text-amber-300">AGUARDANDO PEÇAS:</strong> encaminhada para a prestadora.</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 8. Departamento -->
+          <!-- 8. Departamento vinculado automaticamente ao Setor - Subsetor -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="departamento" class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Departamento:
@@ -540,16 +560,16 @@
                 id="departamento"
                 name="departamento"
                 readonly
-                class="w-full bg-[#f1f5f9] border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] font-medium focus:outline-none"
+                class="w-full bg-[#edf2f7] border border-[#cbd5e1] rounded-[3px] px-2.5 py-1.5 text-[#0b2545] font-semibold cursor-default focus:outline-none"
               />
             </div>
           </div>
 
-          <!-- Última atualização resumida -->
-          <div id="lastUpdateSummaryRow" class="pt-1 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-            <span id="lastUpdateSummaryText">Nenhuma alteração registrada ainda para esta ficha.</span>
-            <button type="button" id="btnVerLinhaTempo" class="text-[#1d5fa7] hover:underline font-semibold cursor-pointer">
-              Ver log →
+          <!-- Resumo da última edição registrada nesta impressora -->
+          <div class="pt-1 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+            <span id="lastUpdateSummaryText" class="truncate">Nenhuma alteração registrada ainda para esta ficha.</span>
+            <button type="button" id="btnVerLinhaTempo" class="text-[#1d5fa7] hover:underline font-semibold shrink-0 ml-2 cursor-pointer">
+              Ver log
             </button>
           </div>
         </div>
@@ -966,28 +986,82 @@
         return pairs ? pairs.join("-") : "";
       }
 
-      function sanitizeIpv4Input(rawValue) {
-        const cleaned = String(rawValue || "").replace(/[^0-9.]/g, "");
-        const parts = cleaned.split(".");
-        const octets = [];
+      function sanitizeIpv4Input(rawValue, isDeleting = false) {
+        const str = String(rawValue || "");
 
-        for (let i = 0; i < parts.length && octets.length < 4; i++) {
-          let part = parts[i];
-          if (part.length > 3) {
-            const firstOctet = part.slice(0, 3);
-            const overflow = part.slice(3);
-            octets.push(firstOctet);
-            parts.splice(i + 1, 0, overflow);
-          } else {
-            octets.push(part);
+        // Caso especial da rede Detran-TO (10.86.x.x):
+        // Se já existe "10." e o usuário digitou o 2º bloco colado com o 3º (ex.: "10.863..." -> "10.86.3...")
+        const detranCollapsedMatch = str.match(/^10\.86(\d)(.*)$/);
+        if (detranCollapsedMatch) {
+          const thirdDigit = detranCollapsedMatch[1];
+          const tail = detranCollapsedMatch[2].replace(/^\.+/, "");
+          const combinedTail = tail ? `${thirdDigit}.${tail}` : (isDeleting ? thirdDigit : `${thirdDigit}.`);
+          return sanitizeIpv4Input(`10.86.${combinedTail}`, isDeleting);
+        }
+
+        // Se o usuário já está usando pontos manualmente, respeita e limpa zeros à esquerda
+        if (str.includes(".")) {
+          const cleaned = str.replace(/[^0-9.]/g, "");
+          const rawParts = cleaned.split(".");
+          const octets = [];
+          for (let i = 0; i < rawParts.length && octets.length < 4; i++) {
+            let part = rawParts[i];
+            if (part.length > 1) {
+              part = part.replace(/^0+/, "") || "0";
+            }
+            if (part.length > 3) {
+              octets.push(part.slice(0, 3));
+              rawParts.splice(i + 1, 0, part.slice(3));
+            } else {
+              octets.push(part);
+            }
           }
+          let res = octets.join(".");
+          if (cleaned.endsWith(".") && octets.length < 4 && !res.endsWith(".")) {
+            res += ".";
+          }
+          return res.slice(0, 15);
         }
 
-        let result = octets.join(".");
-        if (cleaned.endsWith(".") && octets.length < 4 && !result.endsWith(".")) {
-          result += ".";
+        // Digitação contínua só com números (sem precisar apertar ponto)
+        const digits = str.replace(/\D/g, "").slice(0, 12);
+        if (!digits) return "";
+
+        // Padrão Detran-TO: 10.86.[1 dígito na sede ou 2 dígitos no Anexo].[1-3 dígitos]
+        if (digits.startsWith("10")) {
+          if (digits.length <= 2) return isDeleting ? digits : digits + ".";
+          const o2 = digits.slice(2, 4);
+          if (digits.length <= 4) {
+            return isDeleting ? `10.${o2}` : `10.${o2}.`;
+          }
+          const rest = digits.slice(4);
+          if (rest.length === 1) {
+            return isDeleting ? `10.${o2}.${rest}` : `10.${o2}.${rest}.`;
+          }
+          // Se o 3º octeto começar com 1 ou 2 e tiver 4+ dígitos restantes (ex: Anexo 10.86.12.150)
+          if (rest.length >= 4 && (rest[0] === "1" || rest[0] === "2")) {
+            return `10.${o2}.${rest.slice(0, 2)}.${rest.slice(2, 5)}`;
+          }
+          // Caso padrão dos blocos da sede com sub-rede de 1 dígito (ex: 1086315 -> 10.86.3.15)
+          return `10.${o2}.${rest[0]}.${rest.slice(1, 4)}`;
         }
-        return result.slice(0, 15);
+
+        // Padrão classe C: 192.168.x.x
+        if (digits.startsWith("192168")) {
+          if (digits.length === 6) return isDeleting ? "192.168" : "192.168.";
+          const rest = digits.slice(6);
+          if (rest.length === 1) {
+            return isDeleting ? `192.168.${rest}` : `192.168.${rest}.`;
+          }
+          if (rest.length >= 4 && (rest[0] === "1" || rest[0] === "2")) {
+            return `192.168.${rest.slice(0, 2)}.${rest.slice(2, 5)}`;
+          }
+          return `192.168.${rest[0]}.${rest.slice(1, 4)}`;
+        }
+
+        // Fallback genérico agrupando a cada 3 dígitos
+        const groups = digits.match(/.{1,3}/g) || [];
+        return groups.slice(0, 4).join(".");
       }
 
       function validateIpv4Complete(ipValue) {
@@ -997,7 +1071,7 @@
         if (parts.length !== 4 || parts.some((p) => p.length === 0 || p.length > 3)) {
           return {
             valid: false,
-            reason: "Endereço IP incompleto. Use 4 blocos (ex.: 192.165.12.23 ou 010.086.001.01)."
+            reason: "Endereço IP incompleto. Use 4 blocos (ex.: 10.86.3.15)."
           };
         }
         for (const p of parts) {
@@ -1101,7 +1175,13 @@
       const fabricanteInput = document.getElementById("fabricante");
       const modeloInput = document.getElementById("modelo");
       const numeroSerieInput = document.getElementById("numeroSerie");
+      const duplicateSerialAlert = document.getElementById("duplicateSerialAlert");
+      const duplicateSerialText = document.getElementById("duplicateSerialText");
+      const btnJumpDuplicateSerial = document.getElementById("btnJumpDuplicateSerial");
       const enderecoIpInput = document.getElementById("enderecoIp");
+      const duplicateIpAlert = document.getElementById("duplicateIpAlert");
+      const duplicateIpText = document.getElementById("duplicateIpText");
+      const btnJumpDuplicateIp = document.getElementById("btnJumpDuplicateIp");
       const btnCopyIp = document.getElementById("btnCopyIp");
       const btnOpenWebIp = document.getElementById("btnOpenWebIp");
       const enderecoMacInput = document.getElementById("enderecoMac");
@@ -1487,19 +1567,127 @@
         return sub.impressoras.find((imp) => imp.id === state.selectedImpressoraId) || sub.impressoras[0];
       }
 
+      function normalizeIpForComparison(ipValue) {
+        const trimmed = String(ipValue || "").trim();
+        if (!trimmed) return "";
+        const check = validateIpv4Complete(trimmed);
+        if (check.valid) {
+          return toStandardBrowserIpv4(trimmed);
+        }
+        return trimmed;
+      }
+
+      function findDuplicatePrinterByIp(ipCandidate) {
+        const normalizedTarget = normalizeIpForComparison(ipCandidate);
+        if (!normalizedTarget) return null;
+        const currentImp = getActiveImpressora();
+        const currentId = currentImp ? currentImp.id : "";
+
+        for (const setor of state.setores) {
+          for (const sub of setor.subsetores) {
+            for (const imp of sub.impressoras) {
+              if (imp.id === currentId) continue;
+              const existingNorm = normalizeIpForComparison(imp.enderecoIp);
+              if (existingNorm && existingNorm === normalizedTarget) {
+                return {
+                  setorId: setor.id,
+                  setorNome: setor.nome,
+                  subsetorId: sub.id,
+                  subsetorNome: sub.nome,
+                  impressora: imp
+                };
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      function findDuplicatePrinterBySerial(serialCandidate) {
+        const targetSerial = String(serialCandidate || "").trim().toUpperCase();
+        if (!targetSerial) return null;
+        const currentImp = getActiveImpressora();
+        const currentId = currentImp ? currentImp.id : "";
+
+        for (const setor of state.setores) {
+          for (const sub of setor.subsetores) {
+            for (const imp of sub.impressoras) {
+              if (imp.id === currentId) continue;
+              const existingSerial = String(imp.numeroSerie || "").trim().toUpperCase();
+              if (existingSerial && existingSerial === targetSerial) {
+                return {
+                  setorId: setor.id,
+                  setorNome: setor.nome,
+                  subsetorId: sub.id,
+                  subsetorNome: sub.nome,
+                  impressora: imp
+                };
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      let lastDuplicateIpMatch = null;
+      let lastDuplicateSerialMatch = null;
+
+      function updateDuplicateWarnings() {
+        const ipMatch = findDuplicatePrinterByIp(enderecoIpInput.value);
+        lastDuplicateIpMatch = ipMatch;
+        if (ipMatch) {
+          const modeloInfo = ipMatch.impressora.modelo ? ` (${ipMatch.impressora.modelo})` : "";
+          duplicateIpText.textContent = `⚠️ Atenção: o IP ${enderecoIpInput.value.trim()} já está em uso em ${ipMatch.setorNome} - ${ipMatch.subsetorNome}${modeloInfo}.`;
+          duplicateIpAlert.classList.remove("hidden");
+        } else {
+          duplicateIpAlert.classList.add("hidden");
+        }
+
+        const serialMatch = findDuplicatePrinterBySerial(numeroSerieInput.value);
+        lastDuplicateSerialMatch = serialMatch;
+        if (serialMatch) {
+          const modeloInfo = serialMatch.impressora.modelo ? ` (${serialMatch.impressora.modelo})` : "";
+          duplicateSerialText.textContent = `⚠️ Atenção: o nº de série ${numeroSerieInput.value.trim().toUpperCase()} já está cadastrado em ${serialMatch.setorNome} - ${serialMatch.subsetorNome}${modeloInfo}.`;
+          duplicateSerialAlert.classList.remove("hidden");
+        } else {
+          duplicateSerialAlert.classList.add("hidden");
+        }
+      }
+
+      btnJumpDuplicateIp.addEventListener("click", () => {
+        if (!lastDuplicateIpMatch) return;
+        state.selectedSetorId = lastDuplicateIpMatch.setorId;
+        state.selectedSubsetorId = lastDuplicateIpMatch.subsetorId;
+        state.selectedImpressoraId = lastDuplicateIpMatch.impressora.id;
+        switchFormTab("dados");
+        renderAll(true);
+        showFeedback(`Ficha aberta: ${lastDuplicateIpMatch.setorNome} - ${lastDuplicateIpMatch.subsetorNome}.`, "info");
+      });
+
+      btnJumpDuplicateSerial.addEventListener("click", () => {
+        if (!lastDuplicateSerialMatch) return;
+        state.selectedSetorId = lastDuplicateSerialMatch.setorId;
+        state.selectedSubsetorId = lastDuplicateSerialMatch.subsetorId;
+        state.selectedImpressoraId = lastDuplicateSerialMatch.impressora.id;
+        switchFormTab("dados");
+        renderAll(true);
+        showFeedback(`Ficha aberta: ${lastDuplicateSerialMatch.setorNome} - ${lastDuplicateSerialMatch.subsetorNome}.`, "info");
+      });
+
       function formatDepartamentoLabel(setor, subsetor) {
         return `${setor.nome} - ${subsetor.nome}`;
       }
 
       function getHistoryForCurrentPrinter() {
         const imp = getActiveImpressora();
-        const deptLabel = formatDepartamentoLabel(getActiveSetor(), getActiveSubsetor());
-        return (state.historico || []).filter((item) => {
-          if (imp && item.impressoraId) {
-            return item.impressoraId === imp.id;
-          }
-          return item.departamento === deptLabel;
-        });
+        const setor = getActiveSetor();
+        const subsetor = getActiveSubsetor();
+        const deptLabel = formatDepartamentoLabel(setor, subsetor);
+        const allLogs = state.historico || [];
+        if (imp) {
+          return allLogs.filter((entry) => entry.impressoraId === imp.id);
+        }
+        return allLogs.filter((entry) => entry.departamento === deptLabel);
       }
 
       function renderPrinterHistoryTab() {
@@ -1686,6 +1874,7 @@
           enderecoMacInput.value = "";
           situacaoInput.value = "NÃO REVISADA";
           applySituacaoVisualStyle("NÃO REVISADA");
+          updateDuplicateWarnings();
           syncThreeSceneFromForm();
           if (animate) triggerCardPulse();
           return;
@@ -1700,6 +1889,7 @@
         const situacaoNorm = normalizeSituacao(imp.situacao);
         situacaoInput.value = situacaoNorm;
         applySituacaoVisualStyle(situacaoNorm);
+        updateDuplicateWarnings();
         syncThreeSceneFromForm();
         if (animate) triggerCardPulse();
       }
@@ -1713,12 +1903,13 @@
         }
       }
 
-      // Eventos de alteração nos seletores superiores
+      // Eventos dos seletores superiores
       selectSetor.addEventListener("change", () => {
         state.selectedSetorId = selectSetor.value;
         const setor = getActiveSetor();
-        state.selectedSubsetorId = setor.subsetores[0].id;
-        const firstImp = setor.subsetores[0].impressoras[0];
+        const firstSub = setor.subsetores[0];
+        state.selectedSubsetorId = firstSub ? firstSub.id : "";
+        const firstImp = firstSub && firstSub.impressoras[0];
         state.selectedImpressoraId = firstImp ? firstImp.id : "";
         renderAll(true);
       });
@@ -1736,13 +1927,35 @@
         populateForm(true);
       });
 
-      // Máscara automática do Endereço IP
+      // Máscara automática do Endereço IP e verificação de duplicidade
       enderecoIpInput.addEventListener("input", (e) => {
-        const sanitized = sanitizeIpv4Input(e.target.value);
+        const isDeleting =
+          e.inputType === "deleteContentBackward" || e.inputType === "deleteContentForward";
+        const sanitized = sanitizeIpv4Input(e.target.value, isDeleting);
         if (e.target.value !== sanitized) {
           e.target.value = sanitized;
         }
+        updateDuplicateWarnings();
         syncThreeSceneFromForm();
+      });
+
+      enderecoIpInput.addEventListener("blur", (e) => {
+        const val = e.target.value.trim().replace(/\.+$/, "");
+        if (!val) {
+          e.target.value = "";
+          return;
+        }
+        const normalized = val
+          .split(".")
+          .map((octet) => (octet === "" ? "" : String(parseInt(octet, 10))))
+          .join(".");
+        e.target.value = normalized;
+        updateDuplicateWarnings();
+        syncThreeSceneFromForm();
+      });
+
+      numeroSerieInput.addEventListener("input", () => {
+        updateDuplicateWarnings();
       });
 
       btnCopyIp.addEventListener("click", () => {
@@ -1882,6 +2095,28 @@
         if (!ipCheck.valid) {
           showFeedback(ipCheck.reason, "error");
           enderecoIpInput.focus();
+          return;
+        }
+
+        const dupIp = findDuplicatePrinterByIp(enderecoIpInput.value);
+        if (dupIp) {
+          updateDuplicateWarnings();
+          showFeedback(
+            `Conflito de IP: ${enderecoIpInput.value.trim()} já está em uso em ${dupIp.setorNome} - ${dupIp.subsetorNome}.`,
+            "error"
+          );
+          enderecoIpInput.focus();
+          return;
+        }
+
+        const dupSerial = findDuplicatePrinterBySerial(numeroSerieInput.value);
+        if (dupSerial) {
+          updateDuplicateWarnings();
+          showFeedback(
+            `Série duplicada: ${numeroSerieInput.value.trim().toUpperCase()} já está cadastrada em ${dupSerial.setorNome} - ${dupSerial.subsetorNome}.`,
+            "error"
+          );
+          numeroSerieInput.focus();
           return;
         }
 
