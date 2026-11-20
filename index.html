@@ -24,6 +24,22 @@
       margin-bottom: -1px;
       position: relative;
       z-index: 2;
+      color: #0b2545;
+      font-weight: 600;
+    }
+
+    .tab-inactive {
+      background-color: #e6edf5;
+      border-top: 2px solid transparent;
+      border-left: 1px solid #cbd5e1;
+      border-right: 1px solid #cbd5e1;
+      border-bottom: 1px solid #9fb3c8;
+      color: #475569;
+      font-weight: 500;
+    }
+    .tab-inactive:hover {
+      background-color: #f1f5f9;
+      color: #0b2545;
     }
 
     .btn-bevel {
@@ -109,7 +125,7 @@
 </head>
 <body class="min-h-screen flex flex-col text-slate-800 relative">
 
-  <!-- Canvas 3D Three.js ao fundo (rede de impressoras, IPs, MACs e pacotes de impressão) -->
+  <!-- Canvas 3D Three.js ao fundo -->
   <canvas id="bgThreeCanvas" aria-hidden="true" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
   <!-- Barra superior institucional ImpriNet - Detran Tocantins -->
@@ -118,8 +134,8 @@
     <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-b from-transparent via-[#07192f]/25 to-[#061529]/65 pointer-events-none"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-3 space-y-2.5">
-      <!-- Linha 1: Identidade ImpriNet + Resumo rápido do parque + Status Firebase -->
-      <div class="flex items-center justify-between gap-4">
+      <!-- Linha 1: Identidade ImpriNet + Resumo rápido do parque + Técnico + Histórico + Status Firebase -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
         <div class="flex items-center gap-3 min-w-0">
           <a href="#" onclick="return false;" aria-label="ImpriNet" class="inline-flex items-center select-none shrink-0 group">
             <svg
@@ -177,7 +193,7 @@
             </svg>
           </a>
 
-          <div class="hidden sm:flex items-center gap-2.5 pl-3 border-l border-[#1d5fa7]/60">
+          <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-[#1d5fa7]/60">
             <span class="px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase whitespace-nowrap bg-[#134074]/90 text-[#f5b700] border border-[#f5b700]/45">
               Detran-TO
             </span>
@@ -187,15 +203,36 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+          <button
+            type="button"
+            id="btnTechnicianIdentity"
+            title="Definir nome do técnico responsável pelas alterações"
+            class="inline-flex items-center gap-1.5 text-xs text-slate-100 hover:text-[#f5b700] bg-[#134074]/90 hover:bg-[#1d5fa7] border border-[#2b6cb0] rounded-full px-3 py-1.5 transition cursor-pointer"
+          >
+            <span>👤</span>
+            <span id="technicianLabel" class="font-semibold max-w-[120px] truncate">Identificar-se</span>
+          </button>
+
+          <button
+            type="button"
+            id="btnHistoricoGeral"
+            title="Abrir histórico completo de alterações da equipe"
+            class="inline-flex items-center gap-1.5 text-xs text-[#f5b700] hover:text-white bg-[#134074]/90 hover:bg-[#1d5fa7] border border-[#f5b700]/55 rounded-full px-3 py-1.5 transition cursor-pointer"
+          >
+            <span>🕒 Histórico</span>
+            <span id="headerHistoryBadge" class="px-1.5 py-0.2 rounded-full bg-[#f5b700] text-[#0b2545] text-[10px] font-extrabold">0</span>
+          </button>
+
           <button
             type="button"
             id="btnCloudConfig"
-            title="Configurar conexão Firebase para hospedagem no GitHub"
-            class="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#f5b700] hover:text-white bg-[#134074]/90 hover:bg-[#1d5fa7] border border-[#f5b700]/50 rounded-full px-3 py-1.5 transition cursor-pointer"
+            title="Configurar conexão Firebase"
+            class="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-200 hover:text-[#f5b700] bg-[#134074]/90 hover:bg-[#1d5fa7] border border-[#2b6cb0] rounded-full px-2.5 py-1.5 transition cursor-pointer"
           >
-            <span>☁ Nuvem</span>
+            <span>☁</span>
           </button>
+
           <div class="flex items-center gap-2 text-xs text-slate-100 bg-[#0f2e54]/90 backdrop-blur-md border border-[#f5b700]/60 rounded-full px-3.5 py-1.5 shadow-md">
             <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b] inline-block"></span>
             <span id="syncStatusText" class="font-semibold tracking-wide">Conectando...</span>
@@ -315,14 +352,28 @@
       </div>
 
       <form id="printerForm" class="p-3.5 sm:p-4 bg-[#f4f7fb]/85 rounded-b-[5px]">
-        <div class="flex items-end">
-          <div class="tab-active px-3.5 py-1.5 text-xs sm:text-[13px] font-semibold text-[#0b2545] rounded-t-[3px] select-none">
+        <!-- Abas: Dados gerais e Histórico da impressora -->
+        <div class="flex items-end gap-1">
+          <button
+            type="button"
+            id="tabBtnDados"
+            class="tab-active px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition"
+          >
             Dados gerais
-          </div>
+          </button>
+          <button
+            type="button"
+            id="tabBtnHistorico"
+            class="tab-inactive px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition inline-flex items-center gap-1.5"
+          >
+            <span>Histórico</span>
+            <span id="tabHistoricoCount" class="px-1.5 py-0.2 rounded-full bg-[#134074] text-white text-[10px] font-bold">0</span>
+          </button>
           <div class="flex-1 border-b border-[#9fb3c8]"></div>
         </div>
 
-        <div class="bg-white/95 border border-[#9fb3c8] p-3.5 sm:p-4 space-y-2.5 text-xs sm:text-[13px] shadow-inner">
+        <!-- Painel 1: Dados gerais -->
+        <div id="tabPanelDados" class="bg-white/95 border border-[#9fb3c8] p-3.5 sm:p-4 space-y-2.5 text-xs sm:text-[13px] shadow-inner">
           <!-- 1. Fabricante -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="fabricante" class="col-span-5 text-right text-[#134074] font-medium pr-1">
@@ -415,7 +466,7 @@
             </div>
           </div>
 
-          <!-- 5. Endereço MAC com formatação automática XX-XX-XX-XX-XX-XX -->
+          <!-- 5. Endereço MAC -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="enderecoMac" class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Endereço MAC:
@@ -432,7 +483,7 @@
             </div>
           </div>
 
-          <!-- 6. Proprietário (texto fixo DETRAN) -->
+          <!-- 6. Proprietário -->
           <div class="grid grid-cols-12 items-center gap-2.5 pt-0.5">
             <span class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Proprietário:
@@ -442,7 +493,7 @@
             </div>
           </div>
 
-          <!-- 7. Situação (NÃO REVISADA / REVISADA / AGUARDANDO PEÇAS) -->
+          <!-- 7. Situação -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="situacao" class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Situação:
@@ -478,7 +529,7 @@
             </div>
           </div>
 
-          <!-- 8. Departamento (SETOR - SUBSETOR sincronizado) -->
+          <!-- 8. Departamento -->
           <div class="grid grid-cols-12 items-center gap-2.5">
             <label for="departamento" class="col-span-5 text-right text-[#134074] font-medium pr-1">
               Departamento:
@@ -493,10 +544,29 @@
               />
             </div>
           </div>
+
+          <!-- Última atualização resumida -->
+          <div id="lastUpdateSummaryRow" class="pt-1 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span id="lastUpdateSummaryText">Nenhuma alteração registrada ainda para esta ficha.</span>
+            <button type="button" id="btnVerLinhaTempo" class="text-[#1d5fa7] hover:underline font-semibold cursor-pointer">
+              Ver log →
+            </button>
+          </div>
+        </div>
+
+        <!-- Painel 2: Histórico desta impressora -->
+        <div id="tabPanelHistorico" class="hidden bg-white/95 border border-[#9fb3c8] p-3.5 sm:p-4 text-xs shadow-inner">
+          <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-200">
+            <span class="font-bold text-[#0b2545]">Linha do tempo deste equipamento</span>
+            <button type="button" id="btnOpenFullHistoryFromTab" class="text-[11px] font-semibold text-[#1d5fa7] hover:underline cursor-pointer">
+              Ver histórico geral →
+            </button>
+          </div>
+          <div id="printerHistoryList" class="max-h-[265px] overflow-y-auto space-y-2 pr-1"></div>
         </div>
 
         <!-- Rodapé com botões Salvar e Cancelar -->
-        <div class="mt-3.5 flex items-center justify-center gap-3">
+        <div id="formActionButtons" class="mt-3.5 flex items-center justify-center gap-3">
           <button
             type="submit"
             id="btnSalvar"
@@ -551,6 +621,83 @@
     </div>
   </div>
 
+  <!-- Modal de Identificação do Técnico -->
+  <div id="technicianModal" class="hidden fixed inset-0 bg-[#07192f]/70 flex items-center justify-center p-4 z-50">
+    <div class="w-full max-w-sm bg-white border border-[#0b2545] rounded-md shadow-2xl overflow-hidden">
+      <div class="bg-[#0b2545] text-white px-4 py-2.5 border-b-2 border-[#f5b700] flex items-center justify-between">
+        <h2 class="text-sm font-semibold">Identificação do Técnico — TI Detran-TO</h2>
+        <button type="button" id="btnCloseTechModal" aria-label="Fechar janela" class="text-white/85 hover:text-[#f5b700] text-lg leading-none cursor-pointer">×</button>
+      </div>
+      <form id="technicianForm" class="p-4 space-y-3 text-xs text-slate-700">
+        <p class="leading-relaxed">
+          Informe seu nome ou matrícula para registrar automaticamente quem realizou cada revisão, cadastro ou alteração de IP no histórico compartilhado:
+        </p>
+        <div>
+          <label for="technicianNameInput" class="block font-semibold text-[#0b2545] mb-1">
+            Nome do Técnico:
+          </label>
+          <input
+            type="text"
+            id="technicianNameInput"
+            required
+            maxlength="40"
+            placeholder="Ex.: João Pedro (TI)"
+            class="w-full border border-slate-300 rounded px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#1d5fa7]"
+          />
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" id="btnCancelTechModal" class="btn-bevel px-3 py-1.5 rounded text-xs font-medium text-[#0b2545] cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-1.5 rounded text-xs font-semibold bg-[#134074] hover:bg-[#1d5fa7] text-white border-b-2 border-[#f5b700] cursor-pointer">
+            Salvar Identificação
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Histórico Geral de Alterações -->
+  <div id="historicoGeralModal" class="hidden fixed inset-0 bg-[#07192f]/75 flex items-center justify-center p-3 sm:p-5 z-50">
+    <div class="w-full max-w-3xl max-h-[88vh] flex flex-col bg-white border border-[#0b2545] rounded-md shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-[#0b2545] via-[#134074] to-[#1d5fa7] text-white px-4 py-2.5 border-b-2 border-[#f5b700] flex items-center justify-between">
+        <div>
+          <h2 class="text-sm sm:text-base font-semibold">Histórico Geral de Alterações — ImpriNet Detran-TO</h2>
+          <p id="historicoGeralSubtitle" class="text-[11px] text-[#f5b700]">Auditoria sincronizada em tempo real com a equipe</p>
+        </div>
+        <button type="button" id="btnCloseHistoricoGeral" aria-label="Fechar histórico" class="text-white/85 hover:text-[#f5b700] text-lg leading-none px-1.5 cursor-pointer">×</button>
+      </div>
+
+      <div class="bg-[#f4f7fb] border-b border-[#cbd5e1] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 flex-wrap text-xs">
+          <span class="font-semibold text-[#0b2545]">Filtrar evento:</span>
+          <button type="button" data-hfilter="TODOS" class="hist-filter-btn px-2.5 py-1 rounded font-semibold bg-[#0b2545] text-[#f5b700] cursor-pointer">
+            Todos
+          </button>
+          <button type="button" data-hfilter="SITUACAO" class="hist-filter-btn px-2.5 py-1 rounded font-semibold bg-white text-[#0b2545] border border-[#cbd5e1] cursor-pointer">
+            Mudança de Situação
+          </button>
+          <button type="button" data-hfilter="EDICAO" class="hist-filter-btn px-2.5 py-1 rounded font-semibold bg-white text-[#0b2545] border border-[#cbd5e1] cursor-pointer">
+            Edições de Dados
+          </button>
+          <button type="button" data-hfilter="CADASTRO" class="hist-filter-btn px-2.5 py-1 rounded font-semibold bg-white text-[#0b2545] border border-[#cbd5e1] cursor-pointer">
+            Novos / Exclusões
+          </button>
+        </div>
+
+        <button
+          type="button"
+          id="btnCopyHistorico"
+          class="px-3 py-1 rounded text-xs font-semibold bg-[#0f766e] hover:bg-[#15803d] text-white cursor-pointer"
+        >
+          Copiar Log
+        </button>
+      </div>
+
+      <div id="historicoGeralBody" class="p-4 overflow-y-auto flex-1 space-y-2.5 text-xs bg-white"></div>
+    </div>
+  </div>
+
   <!-- Modal de Relatório Técnico para Prestadora de Peças -->
   <div id="relatorioModal" class="hidden fixed inset-0 bg-[#07192f]/70 flex items-center justify-center p-3 sm:p-5 z-50">
     <div class="w-full max-w-3xl max-h-[88vh] flex flex-col bg-white border border-[#0b2545] rounded-md shadow-2xl overflow-hidden">
@@ -601,7 +748,7 @@
     </div>
   </div>
 
-  <!-- Modal de Configuração Firebase (para uso quando hospedado no GitHub Pages) -->
+  <!-- Modal de Configuração Firebase -->
   <div id="cloudConfigModal" class="hidden fixed inset-0 bg-[#07192f]/75 flex items-center justify-center p-4 z-50">
     <div class="w-full max-w-md bg-white border border-[#0b2545] rounded-md shadow-2xl overflow-hidden">
       <div class="bg-[#0b2545] text-white px-4 py-2.5 border-b-2 border-[#f5b700] flex items-center justify-between">
@@ -610,7 +757,7 @@
       </div>
       <form id="cloudConfigForm" class="p-4 space-y-3 text-xs text-slate-700">
         <p class="leading-relaxed">
-          Aqui no ambiente já está conectado automaticamente. Se você hospedar este arquivo no <strong>GitHub Pages</strong>, cole abaixo o JSON do seu projeto Firebase para que todos os colegas compartilhem os mesmos dados em tempo real:
+          Conectado ao projeto <strong>imprinet-detran-to</strong>. Caso precise apontar para outro projeto Firebase, cole o JSON abaixo:
         </p>
         <div>
           <label for="firebaseConfigJsonInput" class="block font-semibold text-[#0b2545] mb-1">
@@ -647,10 +794,18 @@
 
     (function () {
       const CHANNEL_NAME = "detalhes_impressora_detran_to_sync";
+      const TECH_NAME_STORAGE_KEY = "imprinet_detran_to_technician_name";
+      const MAX_HISTORY_ENTRIES = 150;
       const appId = typeof __app_id !== "undefined" ? __app_id : "imprinet-detran-to";
 
-      // Cole aqui o objeto firebaseConfig do seu projeto se quiser deixar fixo no GitHub
-      const GITHUB_DEFAULT_FIREBASE_CONFIG = null;
+      const GITHUB_DEFAULT_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyBKlclQpTfanY86Gb5UnV5t9ZPDpqxikaM",
+        authDomain: "imprinet-detran-to.firebaseapp.com",
+        projectId: "imprinet-detran-to",
+        storageBucket: "imprinet-detran-to.firebasestorage.app",
+        messagingSenderId: "52475421207",
+        appId: "1:52475421207:web:5747c156beb589396bb252"
+      };
 
       let firebaseApp = null;
       let db = null;
@@ -658,6 +813,35 @@
       let currentUser = null;
       let unsubscribeFirestore = null;
       let isApplyingRemoteSnapshot = false;
+      let pendingActionAfterTechIdentify = null;
+
+      function getTechnicianName() {
+        try {
+          return (localStorage.getItem(TECH_NAME_STORAGE_KEY) || "").trim();
+        } catch (err) {
+          return "";
+        }
+      }
+
+      function setTechnicianName(name) {
+        const clean = String(name || "").trim().slice(0, 40);
+        try {
+          if (clean) {
+            localStorage.setItem(TECH_NAME_STORAGE_KEY, clean);
+          } else {
+            localStorage.removeItem(TECH_NAME_STORAGE_KEY);
+          }
+        } catch (err) {
+          // Ignora erro de storage bloqueado
+        }
+        updateTechnicianBadge();
+      }
+
+      function formatTimestampPtBr(ts) {
+        const d = new Date(ts || Date.now());
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} às ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
 
       function sortByNomePtBr(list) {
         return [...list].sort((a, b) =>
@@ -676,6 +860,7 @@
         selectedSetorId: "setor-anexo",
         selectedSubsetorId: "sub-anexo-1",
         selectedImpressoraId: "",
+        historico: [],
         setores: [
           {
             id: "setor-bloco-4",
@@ -868,11 +1053,16 @@
         const selectedSub = selectedSetor.subsetores.find((sub) => sub.id === rawState.selectedSubsetorId) || selectedSetor.subsetores[0];
         const selectedImp = selectedSub.impressoras.find((imp) => imp.id === rawState.selectedImpressoraId) || selectedSub.impressoras[0];
 
+        const historicoNorm = Array.isArray(rawState.historico)
+          ? rawState.historico.slice(0, MAX_HISTORY_ENTRIES)
+          : [];
+
         return {
           selectedSetorId: selectedSetor.id,
           selectedSubsetorId: selectedSub.id,
           selectedImpressoraId: selectedImp ? selectedImp.id : "",
-          setores: setoresNorm
+          setores: setoresNorm,
+          historico: historicoNorm
         };
       }
 
@@ -889,6 +1079,22 @@
       const btnAddImpressora = document.getElementById("btnAddImpressora");
       const btnDeleteImpressora = document.getElementById("btnDeleteImpressora");
       const btnRelatorioTecnico = document.getElementById("btnRelatorioTecnico");
+
+      const btnTechnicianIdentity = document.getElementById("btnTechnicianIdentity");
+      const technicianLabel = document.getElementById("technicianLabel");
+      const btnHistoricoGeral = document.getElementById("btnHistoricoGeral");
+      const headerHistoryBadge = document.getElementById("headerHistoryBadge");
+
+      const tabBtnDados = document.getElementById("tabBtnDados");
+      const tabBtnHistorico = document.getElementById("tabBtnHistorico");
+      const tabHistoricoCount = document.getElementById("tabHistoricoCount");
+      const tabPanelDados = document.getElementById("tabPanelDados");
+      const tabPanelHistorico = document.getElementById("tabPanelHistorico");
+      const formActionButtons = document.getElementById("formActionButtons");
+      const printerHistoryList = document.getElementById("printerHistoryList");
+      const lastUpdateSummaryText = document.getElementById("lastUpdateSummaryText");
+      const btnVerLinhaTempo = document.getElementById("btnVerLinhaTempo");
+      const btnOpenFullHistoryFromTab = document.getElementById("btnOpenFullHistoryFromTab");
 
       const printerModalCard = document.getElementById("printerModalCard");
       const printerForm = document.getElementById("printerForm");
@@ -916,6 +1122,18 @@
       const btnCloseQuickModal = document.getElementById("btnCloseQuickModal");
       const btnCancelQuickModal = document.getElementById("btnCancelQuickModal");
 
+      const technicianModal = document.getElementById("technicianModal");
+      const technicianForm = document.getElementById("technicianForm");
+      const technicianNameInput = document.getElementById("technicianNameInput");
+      const btnCloseTechModal = document.getElementById("btnCloseTechModal");
+      const btnCancelTechModal = document.getElementById("btnCancelTechModal");
+
+      const historicoGeralModal = document.getElementById("historicoGeralModal");
+      const btnCloseHistoricoGeral = document.getElementById("btnCloseHistoricoGeral");
+      const historicoGeralBody = document.getElementById("historicoGeralBody");
+      const historicoGeralSubtitle = document.getElementById("historicoGeralSubtitle");
+      const btnCopyHistorico = document.getElementById("btnCopyHistorico");
+
       const relatorioModal = document.getElementById("relatorioModal");
       const btnCloseRelatorio = document.getElementById("btnCloseRelatorio");
       const relatorioBody = document.getElementById("relatorioBody");
@@ -939,6 +1157,59 @@
       const syncStatusText = document.getElementById("syncStatusText");
 
       let feedbackTimer = null;
+
+      function updateTechnicianBadge() {
+        const name = getTechnicianName();
+        if (technicianLabel) {
+          technicianLabel.textContent = name || "Identificar-se";
+        }
+      }
+      updateTechnicianBadge();
+
+      function openTechnicianModal(callbackAfter = null) {
+        pendingActionAfterTechIdentify = callbackAfter;
+        technicianNameInput.value = getTechnicianName();
+        technicianModal.classList.remove("hidden");
+        setTimeout(() => technicianNameInput.focus(), 30);
+      }
+
+      function closeTechnicianModal() {
+        technicianModal.classList.add("hidden");
+        pendingActionAfterTechIdentify = null;
+      }
+
+      btnTechnicianIdentity.addEventListener("click", () => openTechnicianModal(null));
+      btnCloseTechModal.addEventListener("click", closeTechnicianModal);
+      btnCancelTechModal.addEventListener("click", closeTechnicianModal);
+
+      technicianForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = technicianNameInput.value.trim();
+        if (!name) return;
+        setTechnicianName(name);
+        const nextAction = pendingActionAfterTechIdentify;
+        closeTechnicianModal();
+        showFeedback(`Técnico identificado como "${name}".`, "success");
+        if (typeof nextAction === "function") {
+          await nextAction();
+        }
+      });
+
+      function pushHistoryEntry({ category, actionTitle, departamento, impressoraId = "", impressoraLabel = "", changes = [] }) {
+        const tech = getTechnicianName() || "Técnico TI";
+        const entry = {
+          id: "hist-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
+          timestamp: Date.now(),
+          tecnico: tech,
+          category,
+          actionTitle,
+          departamento,
+          impressoraId,
+          impressoraLabel,
+          changes
+        };
+        state.historico = [entry, ...(state.historico || [])].slice(0, MAX_HISTORY_ENTRIES);
+      }
 
       function showFeedback(text, type = "success") {
         if (feedbackTimer) clearTimeout(feedbackTimer);
@@ -1001,8 +1272,9 @@
               docRef,
               {
                 setores: state.setores,
+                historico: state.historico || [],
                 updatedAt: Date.now(),
-                updatedBy: currentUser.uid
+                updatedBy: getTechnicianName() || currentUser.uid
               },
               { merge: true }
             );
@@ -1099,7 +1371,8 @@
                     selectedSetorId: state.selectedSetorId,
                     selectedSubsetorId: state.selectedSubsetorId,
                     selectedImpressoraId: state.selectedImpressoraId,
-                    setores: remoteData.setores
+                    setores: remoteData.setores,
+                    historico: Array.isArray(remoteData.historico) ? remoteData.historico : []
                   });
                   renderAll(false);
                   isApplyingRemoteSnapshot = false;
@@ -1107,8 +1380,9 @@
               } else {
                 await setDoc(docRef, {
                   setores: state.setores,
+                  historico: state.historico || [],
                   updatedAt: Date.now(),
-                  updatedBy: currentUser.uid
+                  updatedBy: getTechnicianName() || currentUser.uid
                 });
               }
               setSyncStatus("Nuvem OK", "bg-[#22c55e]");
@@ -1172,6 +1446,32 @@
         });
       }
 
+      // Controle das Abas da Ficha ("Dados gerais" vs "Histórico")
+      function switchFormTab(tabName) {
+        if (tabName === "historico") {
+          tabBtnDados.className = "tab-inactive px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition";
+          tabBtnHistorico.className = "tab-active px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition inline-flex items-center gap-1.5";
+          tabPanelDados.classList.add("hidden");
+          tabPanelHistorico.classList.remove("hidden");
+          formActionButtons.classList.add("hidden");
+          renderPrinterHistoryTab();
+        } else {
+          tabBtnDados.className = "tab-active px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition";
+          tabBtnHistorico.className = "tab-inactive px-3.5 py-1.5 text-xs sm:text-[13px] rounded-t-[3px] select-none cursor-pointer transition inline-flex items-center gap-1.5";
+          tabPanelHistorico.classList.add("hidden");
+          tabPanelDados.classList.remove("hidden");
+          formActionButtons.classList.remove("hidden");
+        }
+      }
+
+      tabBtnDados.addEventListener("click", () => switchFormTab("dados"));
+      tabBtnHistorico.addEventListener("click", () => switchFormTab("historico"));
+      btnVerLinhaTempo.addEventListener("click", () => switchFormTab("historico"));
+      btnOpenFullHistoryFromTab.addEventListener("click", () => {
+        renderHistoricoGeralModal();
+        historicoGeralModal.classList.remove("hidden");
+      });
+
       function getActiveSetor() {
         return state.setores.find((s) => s.id === state.selectedSetorId) || state.setores[0];
       }
@@ -1189,6 +1489,50 @@
 
       function formatDepartamentoLabel(setor, subsetor) {
         return `${setor.nome} - ${subsetor.nome}`;
+      }
+
+      function getHistoryForCurrentPrinter() {
+        const imp = getActiveImpressora();
+        const deptLabel = formatDepartamentoLabel(getActiveSetor(), getActiveSubsetor());
+        return (state.historico || []).filter((item) => {
+          if (imp && item.impressoraId) {
+            return item.impressoraId === imp.id;
+          }
+          return item.departamento === deptLabel;
+        });
+      }
+
+      function renderPrinterHistoryTab() {
+        const logs = getHistoryForCurrentPrinter();
+        tabHistoricoCount.textContent = String(logs.length);
+        printerHistoryList.innerHTML = "";
+
+        if (logs.length === 0) {
+          printerHistoryList.innerHTML = `
+            <div class="text-center py-8 text-slate-400">
+              Nenhuma alteração registrada ainda para este equipamento.
+            </div>
+          `;
+          return;
+        }
+
+        logs.forEach((entry) => {
+          const itemEl = document.createElement("div");
+          itemEl.className = "border border-slate-200 rounded p-2.5 bg-[#f8fafc] space-y-1";
+          const changesHtml = (entry.changes || [])
+            .map((c) => `<div class="text-[11px] font-mono text-slate-700">• ${c}</div>`)
+            .join("");
+
+          itemEl.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-[#0b2545]">${entry.actionTitle}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#134074]/10 text-[#134074]">👤 ${entry.tecnico}</span>
+            </div>
+            <div class="text-[10px] text-slate-500">${formatTimestampPtBr(entry.timestamp)}</div>
+            ${changesHtml}
+          `;
+          printerHistoryList.appendChild(itemEl);
+        });
       }
 
       function applySituacaoVisualStyle(value) {
@@ -1256,6 +1600,9 @@
           });
         });
         headerParkSummary.textContent = `${total} cadastrada${total === 1 ? "" : "s"} • ${revisadas} revisada${revisadas === 1 ? "" : "s"}`;
+        if (headerHistoryBadge) {
+          headerHistoryBadge.textContent = String((state.historico || []).length);
+        }
       }
 
       function renderSelectors() {
@@ -1318,6 +1665,19 @@
 
         departamentoInput.value = formatDepartamentoLabel(setor, subsetor);
 
+        const logs = getHistoryForCurrentPrinter();
+        tabHistoricoCount.textContent = String(logs.length);
+        if (logs.length > 0) {
+          const latest = logs[0];
+          lastUpdateSummaryText.textContent = `Última edição: ${latest.tecnico} (${formatTimestampPtBr(latest.timestamp)})`;
+        } else {
+          lastUpdateSummaryText.textContent = "Nenhuma alteração registrada ainda para esta ficha.";
+        }
+
+        if (!tabPanelHistorico.classList.contains("hidden")) {
+          renderPrinterHistoryTab();
+        }
+
         if (!imp) {
           fabricanteInput.value = "Brother";
           modeloInput.value = "";
@@ -1348,6 +1708,9 @@
         renderSelectors();
         updateHeaderParkSummary();
         populateForm(animate);
+        if (!historicoGeralModal.classList.contains("hidden")) {
+          renderHistoricoGeralModal();
+        }
       }
 
       // Eventos de alteração nos seletores superiores
@@ -1382,7 +1745,6 @@
         syncThreeSceneFromForm();
       });
 
-      // Botões de 1 clique no campo Endereço IP
       btnCopyIp.addEventListener("click", () => {
         const ip = enderecoIpInput.value.trim();
         if (!ip) {
@@ -1413,7 +1775,6 @@
         window.open(url, "_blank", "noopener,noreferrer");
       });
 
-      // Máscara automática do Endereço MAC
       enderecoMacInput.addEventListener("input", (e) => {
         const formatted = formatMacAddress(e.target.value);
         if (e.target.value !== formatted) {
@@ -1431,19 +1792,11 @@
         syncThreeSceneFromForm();
       });
 
-      // Salvar ficha da impressora
-      printerForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const ipCheck = validateIpv4Complete(enderecoIpInput.value);
-        if (!ipCheck.valid) {
-          showFeedback(ipCheck.reason, "error");
-          enderecoIpInput.focus();
-          return;
-        }
-
+      // Lógica de salvamento com geração detalhada de log no histórico
+      async function executeSavePrinter() {
         const setor = getActiveSetor();
         const subsetor = getActiveSubsetor();
+        const deptLabel = formatDepartamentoLabel(setor, subsetor);
         let imp = getActiveImpressora();
 
         const formData = {
@@ -1463,13 +1816,81 @@
           };
           subsetor.impressoras.push(imp);
           state.selectedImpressoraId = imp.id;
+
+          const summaryDiff = [
+            `Modelo: ${formData.modelo || "Não informado"}`,
+            `IP: ${formData.enderecoIp || "Sem IP"}`,
+            `Situação: ${formData.situacao}`
+          ];
+          if (formData.numeroSerie) summaryDiff.push(`Série: ${formData.numeroSerie}`);
+          if (formData.enderecoMac) summaryDiff.push(`MAC: ${formData.enderecoMac}`);
+
+          pushHistoryEntry({
+            category: "CADASTRO",
+            actionTitle: "Impressora cadastrada",
+            departamento: deptLabel,
+            impressoraId: imp.id,
+            impressoraLabel: formData.modelo || formData.enderecoIp || "Impressora",
+            changes: summaryDiff
+          });
         } else {
+          const diffs = [];
+          let hasSituacaoChange = false;
+
+          if ((imp.modelo || "") !== formData.modelo) {
+            diffs.push(`Modelo: "${imp.modelo || "-"}" → "${formData.modelo || "-"}"`);
+          }
+          if ((imp.numeroSerie || "") !== formData.numeroSerie) {
+            diffs.push(`Série: "${imp.numeroSerie || "-"}" → "${formData.numeroSerie || "-"}"`);
+          }
+          if ((imp.enderecoIp || "") !== formData.enderecoIp) {
+            diffs.push(`IP: "${imp.enderecoIp || "-"}" → "${formData.enderecoIp || "-"}"`);
+          }
+          if ((imp.enderecoMac || "") !== formData.enderecoMac) {
+            diffs.push(`MAC: "${imp.enderecoMac || "-"}" → "${formData.enderecoMac || "-"}"`);
+          }
+          if (normalizeSituacao(imp.situacao) !== formData.situacao) {
+            diffs.push(`Situação: ${normalizeSituacao(imp.situacao)} → ${formData.situacao}`);
+            hasSituacaoChange = true;
+          }
+
           Object.assign(imp, formData);
+
+          if (diffs.length > 0) {
+            pushHistoryEntry({
+              category: hasSituacaoChange ? "SITUACAO" : "EDICAO",
+              actionTitle: hasSituacaoChange
+                ? `Situação alterada para ${formData.situacao}`
+                : "Dados técnicos atualizados",
+              departamento: deptLabel,
+              impressoraId: imp.id,
+              impressoraLabel: formData.modelo || formData.enderecoIp || "Impressora",
+              changes: diffs
+            });
+          }
         }
 
         renderAll(true);
         await persistState(true);
-        showFeedback(`Impressora salva em ${formatDepartamentoLabel(setor, subsetor)}.`, "success");
+        showFeedback(`Impressora salva em ${deptLabel}.`, "success");
+      }
+
+      printerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ipCheck = validateIpv4Complete(enderecoIpInput.value);
+        if (!ipCheck.valid) {
+          showFeedback(ipCheck.reason, "error");
+          enderecoIpInput.focus();
+          return;
+        }
+
+        if (!getTechnicianName()) {
+          openTechnicianModal(executeSavePrinter);
+          return;
+        }
+
+        await executeSavePrinter();
       });
 
       function resetFormToSaved() {
@@ -1480,10 +1901,11 @@
       btnCancelar.addEventListener("click", resetFormToSaved);
       btnCloseModal.addEventListener("click", resetFormToSaved);
 
-      // Adicionar nova impressora no subsetor atual
+      // Adicionar nova impressora
       btnAddImpressora.addEventListener("click", async () => {
         const setor = getActiveSetor();
         const subsetor = getActiveSubsetor();
+        const deptLabel = formatDepartamentoLabel(setor, subsetor);
         const novaImp = {
           id: "imp-" + Date.now(),
           fabricante: "Brother",
@@ -1497,17 +1919,43 @@
 
         subsetor.impressoras.push(novaImp);
         state.selectedImpressoraId = novaImp.id;
+
+        pushHistoryEntry({
+          category: "CADASTRO",
+          actionTitle: "Nova ficha de impressora criada",
+          departamento: deptLabel,
+          impressoraId: novaImp.id,
+          impressoraLabel: "Nova impressora",
+          changes: ["Situação inicial: NÃO REVISADA"]
+        });
+
         renderAll(true);
         await persistState(true);
+        switchFormTab("dados");
         modeloInput.focus();
-        showFeedback(`Nova ficha criada em ${formatDepartamentoLabel(setor, subsetor)}.`, "info");
+        showFeedback(`Nova ficha criada em ${deptLabel}.`, "info");
       });
 
       // Excluir impressora selecionada
       btnDeleteImpressora.addEventListener("click", async () => {
+        const setor = getActiveSetor();
         const subsetor = getActiveSubsetor();
         const imp = getActiveImpressora();
         if (!imp) return;
+
+        const deptLabel = formatDepartamentoLabel(setor, subsetor);
+        const label = imp.modelo || imp.enderecoIp || "Impressora";
+
+        pushHistoryEntry({
+          category: "CADASTRO",
+          actionTitle: "Impressora removida",
+          departamento: deptLabel,
+          impressoraId: imp.id,
+          impressoraLabel: label,
+          changes: [
+            `Modelo: ${imp.modelo || "-"} | IP: ${imp.enderecoIp || "-"} | Situação: ${normalizeSituacao(imp.situacao)}`
+          ]
+        });
 
         subsetor.impressoras = subsetor.impressoras.filter((item) => item.id !== imp.id);
         const nextImp = subsetor.impressoras[0];
@@ -1567,6 +2015,14 @@
           state.selectedSetorId = novoSetor.id;
           state.selectedSubsetorId = novoSubId;
           state.selectedImpressoraId = "";
+
+          pushHistoryEntry({
+            category: "CADASTRO",
+            actionTitle: "Novo setor criado",
+            departamento: `${nome} - GERAL`,
+            changes: [`Setor "${nome}" adicionado ao inventário`]
+          });
+
           showFeedback(`Setor "${nome}" criado.`, "success");
         } else if (quickModalMode === "subsetor") {
           const setor = getActiveSetor();
@@ -1578,12 +2034,118 @@
           setor.subsetores = sortByNomePtBr([...setor.subsetores, novoSub]);
           state.selectedSubsetorId = novoSub.id;
           state.selectedImpressoraId = "";
+
+          pushHistoryEntry({
+            category: "CADASTRO",
+            actionTitle: "Novo subsetor criado",
+            departamento: `${setor.nome} - ${nome}`,
+            changes: [`Subsetor "${nome}" adicionado em ${setor.nome}`]
+          });
+
           showFeedback(`Subsetor "${nome}" adicionado em ${setor.nome}.`, "success");
         }
 
         closeQuickModal();
         renderAll(true);
         await persistState(true);
+      });
+
+      // Modal de Histórico Geral
+      let currentHistoryFilter = "TODOS";
+
+      function filterHistoryEntries(entries, filter) {
+        if (filter === "TODOS") return entries;
+        return entries.filter((e) => e.category === filter);
+      }
+
+      function renderHistoricoGeralModal() {
+        const allLogs = state.historico || [];
+        const filtered = filterHistoryEntries(allLogs, currentHistoryFilter);
+        historicoGeralSubtitle.textContent = `${allLogs.length} registro(s) sincronizado(s) • Exibindo ${filtered.length}`;
+        historicoGeralBody.innerHTML = "";
+
+        if (filtered.length === 0) {
+          historicoGeralBody.innerHTML = `<div class="text-center py-8 text-slate-500">Nenhuma alteração encontrada neste filtro.</div>`;
+          return;
+        }
+
+        filtered.forEach((entry) => {
+          const badgeClass =
+            entry.category === "SITUACAO"
+              ? "bg-amber-100 text-[#b45309] border-amber-300"
+              : entry.category === "CADASTRO"
+              ? "bg-emerald-100 text-[#15803d] border-emerald-300"
+              : "bg-sky-100 text-[#1d5fa7] border-sky-300";
+
+          const badgeLabel =
+            entry.category === "SITUACAO"
+              ? "SITUAÇÃO"
+              : entry.category === "CADASTRO"
+              ? "CADASTRO"
+              : "EDIÇÃO";
+
+          const changesHtml = (entry.changes || [])
+            .map((c) => `<div class="font-mono text-[11px] text-slate-700">• ${c}</div>`)
+            .join("");
+
+          const card = document.createElement("div");
+          card.className = "border border-[#cbd5e1] rounded p-3 bg-[#f8fafc] space-y-1.5";
+          card.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeClass}">${badgeLabel}</span>
+                <span class="font-bold text-[#0b2545]">${entry.actionTitle}</span>
+                <span class="text-slate-600 font-semibold">— ${entry.departamento}</span>
+              </div>
+              <span class="text-[11px] font-semibold text-[#134074] bg-white border border-slate-200 rounded-full px-2.5 py-0.5">
+                👤 ${entry.tecnico} • ${formatTimestampPtBr(entry.timestamp)}
+              </span>
+            </div>
+            <div class="pl-1 space-y-0.5">${changesHtml}</div>
+          `;
+          historicoGeralBody.appendChild(card);
+        });
+      }
+
+      btnHistoricoGeral.addEventListener("click", () => {
+        renderHistoricoGeralModal();
+        historicoGeralModal.classList.remove("hidden");
+      });
+
+      btnCloseHistoricoGeral.addEventListener("click", () => {
+        historicoGeralModal.classList.add("hidden");
+      });
+
+      document.querySelectorAll(".hist-filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentHistoryFilter = btn.dataset.hfilter;
+          document.querySelectorAll(".hist-filter-btn").forEach((b) => {
+            b.className = "hist-filter-btn px-2.5 py-1 rounded font-semibold bg-white text-[#0b2545] border border-[#cbd5e1] cursor-pointer";
+          });
+          btn.className = "hist-filter-btn px-2.5 py-1 rounded font-semibold bg-[#0b2545] text-[#f5b700] cursor-pointer";
+          renderHistoricoGeralModal();
+        });
+      });
+
+      btnCopyHistorico.addEventListener("click", () => {
+        const filtered = filterHistoryEntries(state.historico || [], currentHistoryFilter);
+        if (filtered.length === 0) {
+          showFeedback("Não há registros para copiar.", "info");
+          return;
+        }
+        const lines = [
+          `*HISTÓRICO DE ALTERAÇÕES IMPRINET - DETRAN-TO*`,
+          `----------------------------------------`
+        ];
+        filtered.forEach((entry) => {
+          lines.push(
+            `• [${formatTimestampPtBr(entry.timestamp)}] ${entry.tecnico} — ${entry.actionTitle} (${entry.departamento})`,
+            ...(entry.changes || []).map((c) => `   ${c}`)
+          );
+        });
+        if (copyTextToClipboard(lines.join("\n"))) {
+          showFeedback("Histórico copiado para a área de transferência!", "success");
+        }
       });
 
       // Relatório Técnico para Prestadora de Peças
@@ -1671,6 +2233,7 @@
             state.selectedSubsetorId = item.subsetorId;
             state.selectedImpressoraId = item.id;
             relatorioModal.classList.add("hidden");
+            switchFormTab("dados");
             renderAll(true);
           });
 
@@ -1748,7 +2311,7 @@
       initFirebaseSync();
 
       // =====================================================================
-      // FUNDO 3D INTERATIVO COM THREE.JS (DETRAN TOCANTINS - REDE DE IMPRESSÃO)
+      // FUNDO 3D INTERATIVO COM THREE.JS
       // =====================================================================
       function createCodeCardTexture(title, subtitle, borderColor, accentColor) {
         const canvas = document.createElement("canvas");
@@ -1829,7 +2392,6 @@
         const networkGroup = new THREE.Group();
         scene.add(networkGroup);
 
-        // Impressora multifuncional 3D estilizada à esquerda
         const printerGroup = new THREE.Group();
         printerGroup.position.set(-6.2, 0.6, -1.5);
         printerGroup.rotation.y = 0.45;
@@ -1889,7 +2451,6 @@
         printerRing.rotation.x = Math.PI / 2.3;
         printerGroup.add(printerRing);
 
-        // Nodos de rede distribuídos
         const nodePositions = [
           new THREE.Vector3(-6.2, 0.6, -1.5),
           new THREE.Vector3(5.8, 2.5, -2.5),
@@ -1917,7 +2478,6 @@
           nodeMeshes.push(mesh);
         });
 
-        // Linhas de conexão e pacotes de dados trafegando
         const connections = [
           [nodePositions[0], nodePositions[1], 0xf5b700],
           [nodePositions[0], nodePositions[3], 0x38bdf8],
@@ -1951,7 +2511,6 @@
           });
         });
 
-        // Cartões flutuantes com dados reativos (IP, MAC, Departamento e Situação)
         const spriteSpecs = [
           { pos: [6.0, 3.35, -2.2], scale: [4.2, 1.45, 1] },
           { pos: [6.8, -1.45, -1.5], scale: [4.2, 1.45, 1] },
@@ -2005,7 +2564,6 @@
           situacao: normalizeSituacao(situacaoInput.value)
         });
 
-        // Partículas de código/dados no ambiente
         const particleCount = 110;
         const particlePositions = new Float32Array(particleCount * 3);
         const particleColors = new Float32Array(particleCount * 3);
